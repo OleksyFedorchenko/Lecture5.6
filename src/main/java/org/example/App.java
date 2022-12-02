@@ -27,9 +27,15 @@ public class App {
         ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
 
-        for (String file : jsonFileNames) {
-            violations.addAll(readFile(file, objectMapper));
-        }
+        CompletableFuture<Void> my=CompletableFuture.allOf(jsonFileNames.stream()
+                .map(file -> CompletableFuture
+                        .supplyAsync(() -> readFile(file, objectMapper), executorService)
+                        .thenAccept(violations::addAll)).toArray(CompletableFuture[]::new));
+        my.join();
+        executorService.shutdown();
+//        for (String file : jsonFileNames) {
+//            violations.addAll(readFile(file, objectMapper));
+//        }
 
 
         //Робимо мапу з типами і сумою штрафів
@@ -47,10 +53,12 @@ public class App {
     }
 
     //Обробка одного файлу
-    public static List<Violation> readFile(String fileName, ObjectMapper objectMapper) throws IOException {
+    public static List<Violation> readFile(String fileName, ObjectMapper objectMapper)  {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             return objectMapper.readValue(br, new TypeReference<List<Violation>>() {
             });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

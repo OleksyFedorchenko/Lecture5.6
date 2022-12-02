@@ -1,0 +1,22 @@
+[{
+  "date_time": "2022-07-07 12:19:03",
+  "first_name": "Maxim",
+  "last_name": "Smolskyi",
+  "type": "ALCOHOL DRIVING",
+  "fine_amount": 432.00
+},
+  {
+    "date_time": "2022-02-05 13:25:03",
+    "first_name": "Oleksandr",
+    "last_name": "Vasyliv",
+    "type": "DRIVING WITHOUT BELT",
+    "fine_amount": 98.00
+  },
+  {
+    "date_time": "2022-06-12 12:54:28",
+    "first_name": "Matviy",
+    "last_name": "Chopyk",
+    "type": "DRIVING WITHOUT BELT",
+    "fine_amount": 224.45
+  }
+]
