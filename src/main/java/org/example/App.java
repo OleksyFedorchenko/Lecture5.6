@@ -11,25 +11,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class App {
+
+
     public static void main(String[] args) throws IOException, JAXBException {
-        ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
-        List<Violation> violations = new ArrayList<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        List<Violation> violations = Collections.synchronizedList(new ArrayList<>());
         List<String> jsonFileNames = getFileNames();
-        ExecutorService executorService = Executors.newFixedThreadPool(5);
+        ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
 
-            for (String file : jsonFileNames) {
-                try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                    violations.addAll(objectMapper.readValue(br, new TypeReference<List<Violation>>() {
-                    }));
-            }
+        for (String file : jsonFileNames) {
+            violations.addAll(readFile(file, objectMapper));
         }
+
 
         //Робимо мапу з типами і сумою штрафів
         Map<String, Double> result = new HashMap<>();
@@ -43,6 +44,14 @@ public class App {
         //Пишемо в XML файл за допомогою парсера JAXB.
         writeResultToXmlByJAXB(sortingResultMap(result));
 
+    }
+
+    //Обробка одного файлу
+    public static List<Violation> readFile(String fileName, ObjectMapper objectMapper) throws IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            return objectMapper.readValue(br, new TypeReference<List<Violation>>() {
+            });
+        }
     }
 
     //Шукаємо всі json файли в поточному каталозі
