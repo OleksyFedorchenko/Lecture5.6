@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<violations>
+    <violation>
+        <entry>
+            <key>ALCOHOL DRIVING</key>
+            <value>1307.2</value>
+        </entry>
+        <entry>
+            <key>DRIVING WITHOUT BELT</key>
+            <value>1096.45</value>
+        </entry>
+        <entry>
+            <key>SPEEDING</key>
+            <value>598.8</value>
+        </entry>
+    </violation>
+</violations>
