@@ -10,7 +10,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -25,16 +24,17 @@ public class App {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         List<Violation> violations = Collections.synchronizedList(new ArrayList<>());
         List<String> jsonFileNames = getFileNames();
+        double scale = Math.pow(10, 3);
         ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
         long start = System.currentTimeMillis();
 
-        CompletableFuture<Void> my=CompletableFuture.allOf(jsonFileNames.stream()
+        CompletableFuture<Void> my = CompletableFuture.allOf(jsonFileNames.stream()
                 .map(file -> CompletableFuture
                         .supplyAsync(() -> readFile(file, objectMapper), executorService)
                         .thenAccept(violations::addAll)).toArray(CompletableFuture[]::new));
         my.join();
         executorService.shutdown();
-        System.out.printf("This operation took %s ms%n", System.currentTimeMillis()-start);
+        System.out.printf("This operation took %s ms%n", System.currentTimeMillis() - start);
         //Робимо мапу з типами і сумою штрафів
         Map<String, Double> result = new HashMap<>();
         for (Violation v : violations) {
@@ -45,12 +45,12 @@ public class App {
         }
 
         //Пишемо в XML файл за допомогою парсера JAXB.
-        writeResultToXmlByJAXB(sortingResultMap(result));
+        writeResultToXmlByJAXB(sortingResultMap(result, scale));
 
     }
 
     //Обробка одного файлу
-    public static List<Violation> readFile(String fileName, ObjectMapper objectMapper)  {
+    public static List<Violation> readFile(String fileName, ObjectMapper objectMapper) {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             return objectMapper.readValue(br, new TypeReference<List<Violation>>() {
             });
@@ -72,8 +72,12 @@ public class App {
     }
 
     //Метод сортування результатів в порядку спадання суми штрафів.
-    public static LinkedHashMap<String, Double> sortingResultMap(Map<String, Double> result) {
-         return result.entrySet().stream()
+    public static LinkedHashMap<String, Double> sortingResultMap(Map<String, Double> result, Double scale) {
+        //Заокруглюємо double до 3 знаків після коми
+        result.entrySet()
+                .forEach(f -> f.setValue(Math.ceil(f.getValue() * scale) / scale));
+        //Сортуємо
+        return result.entrySet().stream()
                 .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (e1, e2) -> e1, LinkedHashMap::new));
