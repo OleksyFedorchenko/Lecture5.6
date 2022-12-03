@@ -21,7 +21,7 @@ public class App {
 
 
     public static void main(String[] args) throws IOException, JAXBException {
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        ExecutorService executorService = Executors.newFixedThreadPool(8);
         List<Violation> violations = Collections.synchronizedList(new ArrayList<>());
         List<String> jsonFileNames = getFileNames();
         ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
