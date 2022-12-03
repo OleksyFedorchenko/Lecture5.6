@@ -10,6 +10,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -21,11 +22,11 @@ public class App {
 
 
     public static void main(String[] args) throws IOException, JAXBException {
-        ExecutorService executorService = Executors.newFixedThreadPool(8);
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
         List<Violation> violations = Collections.synchronizedList(new ArrayList<>());
         List<String> jsonFileNames = getFileNames();
         ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
-
+        long start = System.currentTimeMillis();
 
         CompletableFuture<Void> my=CompletableFuture.allOf(jsonFileNames.stream()
                 .map(file -> CompletableFuture
@@ -33,11 +34,7 @@ public class App {
                         .thenAccept(violations::addAll)).toArray(CompletableFuture[]::new));
         my.join();
         executorService.shutdown();
-//        for (String file : jsonFileNames) {
-//            violations.addAll(readFile(file, objectMapper));
-//        }
-
-
+        System.out.printf("This operation took %s ms%n", System.currentTimeMillis()-start);
         //Робимо мапу з типами і сумою штрафів
         Map<String, Double> result = new HashMap<>();
         for (Violation v : violations) {
@@ -76,7 +73,7 @@ public class App {
 
     //Метод сортування результатів в порядку спадання суми штрафів.
     public static LinkedHashMap<String, Double> sortingResultMap(Map<String, Double> result) {
-        return result.entrySet().stream()
+         return result.entrySet().stream()
                 .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (e1, e2) -> e1, LinkedHashMap::new));
