@@ -32,6 +32,7 @@ public class ParsingFileAndReturnInstanceOfObject {
         Field[] fields = c.getClass().getDeclaredFields();
         //робимо мапу з назвами полів і відповідними аннотаціями
         Map<String, String> fieldsAnnotations = new HashMap<>();
+        //читаємо всі аннотації полів з вхідного классу
         for (Field f : fields
         ) {
             Annotation a = f.getAnnotation(Property.class);
