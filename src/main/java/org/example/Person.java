@@ -13,6 +13,6 @@ import java.time.Instant;
 @ToString
 public class Person {
     private String stringProperty;
+    @Property(name = "numberProperty")
     private int myNumber;
-    private Instant timeProperty;
 }

@@ -10,6 +10,6 @@ public class App2 {
         Path path = Paths.get("\\in.property");
         System.out.println(path.getFileName());
         Person p = ParsingFileAndReturnInstanceOfObject.loadFromProperties(Person.class, path);
-//        System.out.println(p.getName());
+        System.out.println(p);
     }
 }
