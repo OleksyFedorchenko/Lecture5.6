@@ -49,20 +49,19 @@ public class ParsingFileAndReturnInstanceOfObject {
                 if (entry.getKey().equals(f.getName())) {
                     switch (f.getType().getName()) {
                         case "java.lang.String":
-                        invokeSetter(c, f.getName(), entry.getValue());
-                        break;
+                            invokeSetter(c, f.getName(), entry.getValue());
+                            break;
                         case "int":
                         case "java.lang.Integer":
                             try {
                                 invokeSetter(c, f.getName(), Integer.parseInt(entry.getValue()));
-                            }
-                            catch (NumberFormatException e){
-                                throw new WrongPropertyException("Can't cast property to int field");
+                            } catch (NumberFormatException e) {
+                                throw new WrongPropertyException("Can't cast property to " + f.getType().getName() + " field. " + "Property:" + entry.getKey());
                             }
                             break;
                     }
                 }
-                if(f.getAnnotation(Property.class)!=null){
+                if (f.getAnnotation(Property.class) != null) {
                     if (entry.getKey().equals(f.getAnnotation(Property.class).name())) {
                         switch (f.getType().getName()) {
                             case "java.lang.String":
@@ -72,9 +71,8 @@ public class ParsingFileAndReturnInstanceOfObject {
                             case "java.lang.Integer":
                                 try {
                                     invokeSetter(c, f.getName(), Integer.parseInt(entry.getValue()));
-                                }
-                                catch (NumberFormatException e){
-                                    throw new WrongPropertyException("Can't cast property to int field");
+                                } catch (NumberFormatException e) {
+                                    throw new WrongPropertyException("Can't cast property to " + f.getType().getName() + " field. " + "Property:" + entry.getKey());
                                 }
                                 break;
                         }
