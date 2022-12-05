@@ -53,7 +53,12 @@ public class ParsingFileAndReturnInstanceOfObject {
                         break;
                         case "int":
                         case "java.lang.Integer":
-                            invokeSetter(c, f.getName(), Integer.parseInt(entry.getValue()));
+                            try {
+                                invokeSetter(c, f.getName(), Integer.parseInt(entry.getValue()));
+                            }
+                            catch (NumberFormatException e){
+                                throw new WrongPropertyException("Can't cast property to int field");
+                            }
                             break;
                     }
                 }
@@ -65,7 +70,12 @@ public class ParsingFileAndReturnInstanceOfObject {
                                 break;
                             case "int":
                             case "java.lang.Integer":
-                                invokeSetter(c, f.getName(), Integer.parseInt(entry.getValue()));
+                                try {
+                                    invokeSetter(c, f.getName(), Integer.parseInt(entry.getValue()));
+                                }
+                                catch (NumberFormatException e){
+                                    throw new WrongPropertyException("Can't cast property to int field");
+                                }
                                 break;
                         }
                     }
