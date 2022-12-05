@@ -1,12 +1,10 @@
 package org.example;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Instant;
 
+@Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
