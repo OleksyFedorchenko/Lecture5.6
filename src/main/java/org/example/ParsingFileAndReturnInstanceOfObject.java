@@ -7,10 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -65,11 +62,13 @@ public class ParsingFileAndReturnInstanceOfObject {
                                 }
                                 break;
                             case "java.time.Instant":
-                                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(f.getAnnotation(Property.class).format(), Locale.getDefault());
-                                LocalDateTime localDateTime = LocalDateTime.parse(entry.getValue(), dateTimeFormatter);
-                                ZoneId zoneId = ZoneId.of("Europe/Paris");
-                                ZonedDateTime zonedDateTime = localDateTime.atZone(zoneId);
-                                invokeSetter(c,f.getName(),zonedDateTime.toInstant());
+                                try {
+                                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(f.getAnnotation(Property.class).format());
+                                    LocalDateTime localDateTime = LocalDateTime.parse(entry.getValue(), dateTimeFormatter);
+                                    invokeSetter(c, f.getName(), localDateTime.toInstant(ZoneOffset.UTC));
+                                } catch (DateTimeException e) {
+                                    throw new ParsingException("Couldn't parse property: " + entry.getKey() + "=" + entry.getValue() + " to field annotation: format=" + f.getAnnotation(Property.class).format());
+                                }
                                 break;
                         }
                     }
@@ -89,21 +88,18 @@ public class ParsingFileAndReturnInstanceOfObject {
                             }
                             break;
                         case "java.time.Instant":
-                            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(f.getAnnotation(Property.class).format(), Locale.getDefault());
-                            LocalDateTime localDateTime = LocalDateTime.parse(entry.getValue(), dateTimeFormatter);
-                            ZoneId zoneId = ZoneId.of("Etc/UTC");
-                            ZonedDateTime zonedDateTime = localDateTime.atZone(zoneId);
-                            invokeSetter(c,f.getName(),zonedDateTime.toInstant());
+                            try {
+                                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(f.getAnnotation(Property.class).format());
+                                LocalDateTime localDateTime = LocalDateTime.parse(entry.getValue(), dateTimeFormatter);
+                                invokeSetter(c, f.getName(), localDateTime.toInstant(ZoneOffset.UTC));
+                            } catch (DateTimeException e) {
+                                throw new ParsingException("Couldn't parse property: " + entry.getKey() + "=" + entry.getValue() + " to field annotation: format=" + f.getAnnotation(Property.class).format());
+                            }
                             break;
                     }
                 }
             }
         }
-
-
-//        Field field = c.getClass().getDeclaredField("name");
-//        field.setAccessible(true);
-//        field.set(c, name);
         return c;
     }
 
@@ -120,6 +116,5 @@ public class ParsingFileAndReturnInstanceOfObject {
         } catch (IntrospectionException e) {
             e.printStackTrace();
         }
-
     }
 }
