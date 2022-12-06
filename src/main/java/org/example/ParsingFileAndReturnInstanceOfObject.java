@@ -20,10 +20,8 @@ public class ParsingFileAndReturnInstanceOfObject {
         Scanner scan = new Scanner(propertyPath.getFileName());
         while (scan.hasNext()) {
             String[] s = scan.nextLine().split("=");
-            System.out.println(Arrays.toString(s));
             propertySet.put(s[0], s[1]);
         }
-        System.out.println(propertySet);
         scan.close();
 
         //отримуємо всі поля з класу
