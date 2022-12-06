@@ -68,6 +68,8 @@ public class ParsingFileAndReturnInstanceOfObject {
                                     invokeSetter(c, f.getName(), localDateTime.toInstant(ZoneOffset.UTC));
                                 } catch (DateTimeException e) {
                                     throw new ParsingException("Couldn't parse property: " + entry.getKey() + "=" + entry.getValue() + " to field annotation: format=" + f.getAnnotation(Property.class).format());
+                                } catch (NullPointerException e) {
+                                    throw new NotFoundAnnotationFormat("Required Property annotation 'format' by field " + f.getName());
                                 }
                                 break;
                         }
@@ -94,6 +96,8 @@ public class ParsingFileAndReturnInstanceOfObject {
                                 invokeSetter(c, f.getName(), localDateTime.toInstant(ZoneOffset.UTC));
                             } catch (DateTimeException e) {
                                 throw new ParsingException("Couldn't parse property: " + entry.getKey() + "=" + entry.getValue() + " to field annotation: format=" + f.getAnnotation(Property.class).format());
+                            } catch (NullPointerException e) {
+                                throw new NotFoundAnnotationFormat("Required Property annotation 'format' by field " + f.getName());
                             }
                             break;
                     }
