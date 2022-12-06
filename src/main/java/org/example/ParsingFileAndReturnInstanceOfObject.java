@@ -49,65 +49,45 @@ public class ParsingFileAndReturnInstanceOfObject {
             for (Field f : fields) {
                 if (f.getAnnotation(Property.class) != null) {
                     if (entry.getKey().equals(f.getAnnotation(Property.class).name())) {
-                        switch (f.getType().getName()) {
-                            case "java.lang.String":
-                                invokeSetter(c, f.getName(), entry.getValue());
-                                break;
-                            case "int":
-                            case "java.lang.Integer":
-                                try {
-                                    invokeSetter(c, f.getName(), Integer.parseInt(entry.getValue()));
-                                } catch (NumberFormatException e) {
-                                    throw new WrongPropertyException("Can't cast property to " + f.getType().getName() + " field. " + "Property:" + entry.getKey());
-                                }
-                                break;
-                            case "java.time.Instant":
-                                try {
-                                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(f.getAnnotation(Property.class).format());
-                                    LocalDateTime localDateTime = LocalDateTime.parse(entry.getValue(), dateTimeFormatter);
-                                    invokeSetter(c, f.getName(), localDateTime.toInstant(ZoneOffset.UTC));
-                                } catch (DateTimeException e) {
-                                    throw new ParsingException("Couldn't parse property: " + entry.getKey() + "=" + entry.getValue() + " to field annotation: format=" + f.getAnnotation(Property.class).format());
-                                } catch (NullPointerException e) {
-                                    throw new NotFoundAnnotationFormat("Required Property annotation 'format' by field " + f.getName());
-                                }
-                                break;
-                        }
+                        parseProperty(c, entry, f);
                     }
                 }
-
                 if (entry.getKey().equals(f.getName())) {
-                    switch (f.getType().getName()) {
-                        case "java.lang.String":
-                            invokeSetter(c, f.getName(), entry.getValue());
-                            break;
-                        case "int":
-                        case "java.lang.Integer":
-                            try {
-                                invokeSetter(c, f.getName(), Integer.parseInt(entry.getValue()));
-                            } catch (NumberFormatException e) {
-                                throw new WrongPropertyException("Can't cast property to " + f.getType().getName() + " field. " + "Property:" + entry.getKey());
-                            }
-                            break;
-                        case "java.time.Instant":
-                            try {
-                                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(f.getAnnotation(Property.class).format());
-                                LocalDateTime localDateTime = LocalDateTime.parse(entry.getValue(), dateTimeFormatter);
-                                invokeSetter(c, f.getName(), localDateTime.toInstant(ZoneOffset.UTC));
-                            } catch (DateTimeException e) {
-                                throw new ParsingException("Couldn't parse property: " + entry.getKey() + "=" + entry.getValue() + " to field annotation: format=" + f.getAnnotation(Property.class).format());
-                            } catch (NullPointerException e) {
-                                throw new NotFoundAnnotationFormat("Required Property annotation 'format' by field " + f.getName());
-                            }
-                            break;
-                    }
+                    parseProperty(c, entry, f);
                 }
             }
         }
         return c;
     }
 
-    public static void invokeSetter(Object obj, String propertyName, Object variableValue) {
+    private static <T> void parseProperty(T c, Map.Entry<String, String> entry, Field f) {
+        switch (f.getType().getName()) {
+            case "java.lang.String":
+                invokeSetter(c, f.getName(), entry.getValue());
+                break;
+            case "int":
+            case "java.lang.Integer":
+                try {
+                    invokeSetter(c, f.getName(), Integer.parseInt(entry.getValue()));
+                } catch (NumberFormatException e) {
+                    throw new WrongPropertyException("Can't cast property to " + f.getType().getName() + " field. " + "Property:" + entry.getKey());
+                }
+                break;
+            case "java.time.Instant":
+                try {
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(f.getAnnotation(Property.class).format());
+                    LocalDateTime localDateTime = LocalDateTime.parse(entry.getValue(), dateTimeFormatter);
+                    invokeSetter(c, f.getName(), localDateTime.toInstant(ZoneOffset.UTC));
+                } catch (DateTimeException e) {
+                    throw new ParsingException("Couldn't parse property: " + entry.getKey() + "=" + entry.getValue() + " to field annotation: format=" + f.getAnnotation(Property.class).format());
+                } catch (NullPointerException e) {
+                    throw new NotFoundAnnotationFormat("Required Property annotation 'format' by field " + f.getName());
+                }
+                break;
+        }
+    }
+
+    private static void invokeSetter(Object obj, String propertyName, Object variableValue) {
         PropertyDescriptor pd;
         try {
             pd = new PropertyDescriptor(propertyName, obj.getClass());
