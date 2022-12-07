@@ -1,4 +1,4 @@
-package org.example;
+package org.example.exceptions;
 
 import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;

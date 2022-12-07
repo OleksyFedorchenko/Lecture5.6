@@ -1,5 +1,9 @@
 package org.example;
 
+import org.example.exceptions.NotFoundAnnotationFormat;
+import org.example.exceptions.ParsingException;
+import org.example.exceptions.WrongPropertyException;
+
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
@@ -14,9 +18,9 @@ import java.util.*;
 public class ParsingFileAndReturnInstanceOfObject {
     public static <T> T loadFromProperties(Class<T> cls, Path propertyPath) throws InstantiationException, IllegalAccessException, IOException {
         T c = cls.newInstance();
-
         Map<String, String> propertySet = new HashMap<>();
 
+        //Зчитуємо in.property в мапу
         Scanner scan = new Scanner(propertyPath.getFileName());
         while (scan.hasNext()) {
             String[] s = scan.nextLine().split("=");
@@ -27,25 +31,10 @@ public class ParsingFileAndReturnInstanceOfObject {
         //отримуємо всі поля з класу
         Field[] fields = c.getClass().getDeclaredFields();
 
-        //робимо мапу з назвами полів і відповідними аннотаціями
-//        Map<String, String> fieldsAnnotations = new HashMap<>();
-//        //читаємо всі аннотації полів з вхідного классу
-//        for (Field f : fields
-//        ) {
-//            Property a = f.getAnnotation(Property.class);
-//            if (a != null) {
-//                fieldsAnnotations.put(f.getName(), a.name());
-//            } else fieldsAnnotations.put(f.getName(), f.getName());
-//        }
-//        System.out.println(fieldsAnnotations);
-
-//    invokeSetter(c,"myNumber", Integer.parseInt("22"));
-//    invokeSetter(c,"stringProperty","Alex");
-
-
+        //Парсимо in.property на філди класу
         for (Map.Entry<String, String> entry : propertySet.entrySet()) {
             for (Field f : fields) {
-                if (f.getAnnotation(Property.class) != null) {
+                if (f.isAnnotationPresent(Property.class)) {
                     if (entry.getKey().equals(f.getAnnotation(Property.class).name())) {
                         parseProperty(c, entry, f);
                     }
