@@ -20,6 +20,8 @@ public class ParsingFileAndReturnInstanceOfObject {
         T c = cls.newInstance();
         Map<String, String> propertySet = new HashMap<>();
 
+        if (propertyPath == null) throw new NullPointerException("Input data cannot be NULL");
+
         //Зчитуємо in.property в мапу
         Scanner scan = new Scanner(propertyPath.getFileName());
         while (scan.hasNext()) {
