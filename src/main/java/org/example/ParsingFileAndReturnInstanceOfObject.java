@@ -1,8 +1,9 @@
 package org.example;
 
-import org.example.exceptions.NotFoundAnnotationFormat;
+import org.example.exceptions.NotFoundAnnotationFormatException;
 import org.example.exceptions.ParsingException;
 import org.example.exceptions.WrongPropertyException;
+import org.example.exceptions.WrongPropertyFileException;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -16,26 +17,28 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class ParsingFileAndReturnInstanceOfObject {
-    public static <T> T loadFromProperties(Class<T> cls, Path propertyPath) throws InstantiationException, IllegalAccessException, IOException {
+    public static <T> T loadFromProperties(Class<T> cls, Path propertyPath) throws InstantiationException, IllegalAccessException, IOException, WrongPropertyFileException {
         T c = cls.newInstance();
         Map<String, String> propertySet = new HashMap<>();
 
-        if (propertyPath == null) throw new NullPointerException("Input data cannot be NULL");
-
         //Зчитуємо in.property в мапу
-        Scanner scan = new Scanner(propertyPath.getFileName());
-        while (scan.hasNext()) {
-            String[] s = scan.nextLine().split("=");
-            propertySet.put(s[0], s[1]);
+        try {
+            Scanner scan = new Scanner(propertyPath.getFileName());
+            while (scan.hasNext()) {
+                String[] s = scan.nextLine().split("=");
+                propertySet.put(s[0], s[1]);
+            }
+            scan.close();
+        } catch (ArrayIndexOutOfBoundsException e){
+            throw new WrongPropertyFileException("Wrong Property file. It should has a format 'key=value'");
         }
-        scan.close();
 
         //отримуємо всі поля з класу
         Field[] fields = c.getClass().getDeclaredFields();
 
         //Парсимо in.property на філди класу
-        for (Map.Entry<String, String> entry : propertySet.entrySet()) {
-            for (Field f : fields) {
+        for (Field f : fields) {
+            for (Map.Entry<String, String> entry : propertySet.entrySet()) {
                 if (f.isAnnotationPresent(Property.class)) {
                     if (entry.getKey().equals(f.getAnnotation(Property.class).name())) {
                         parseProperty(c, entry, f);
@@ -46,6 +49,7 @@ public class ParsingFileAndReturnInstanceOfObject {
                 }
             }
         }
+
         return c;
     }
 
@@ -59,7 +63,7 @@ public class ParsingFileAndReturnInstanceOfObject {
                 try {
                     invokeSetter(c, f.getName(), Integer.parseInt(entry.getValue()));
                 } catch (NumberFormatException e) {
-                    throw new WrongPropertyException("Can't cast property to " + f.getType().getName() + " field. " + "Property:" + entry.getKey());
+                    throw new WrongPropertyException("Can't cast property to " + f.getType().getName() + " field. " + "Property:" + entry.getKey() + " Property value:" + entry.getValue());
                 }
                 break;
             case "java.time.Instant":
@@ -70,7 +74,7 @@ public class ParsingFileAndReturnInstanceOfObject {
                 } catch (DateTimeException e) {
                     throw new ParsingException("Couldn't parse property: " + entry.getKey() + "=" + entry.getValue() + " to field annotation: format=" + f.getAnnotation(Property.class).format());
                 } catch (NullPointerException e) {
-                    throw new NotFoundAnnotationFormat("Required Property annotation 'format' by field " + f.getName());
+                    throw new NotFoundAnnotationFormatException("Required Property annotation 'format' by field " + f.getName());
                 }
                 break;
         }

@@ -1,28 +1,40 @@
 package org.example;
 
+import org.example.exceptions.WrongPropertyException;
+import org.example.exceptions.WrongPropertyFileException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit test for simple App.
  */
-public class AppTest 
-{
+public class AppTest {
     /**
      * Rigorous Test :-)
      */
 
+    @Test
+    public void TypeOfInstance() throws IOException, InstantiationException, IllegalAccessException, WrongPropertyFileException {
+        Path path = Paths.get("\\in.property");
+        String expected = Person.class.getTypeName();
+        assertEquals(expected, ParsingFileAndReturnInstanceOfObject.loadFromProperties(Person.class, path).getClass().getTypeName());
+    }
+
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
 
+
     @Test
-    public void InputPathIsNull() throws IllegalAccessException, IOException, InstantiationException {
-        exceptionRule.expect(NullPointerException.class);
-        exceptionRule.expectMessage("Input data cannot be NULL");
-        ParsingFileAndReturnInstanceOfObject.loadFromProperties(Person.class,null);
+    public void WrongProperty() throws IllegalAccessException, IOException, InstantiationException, WrongPropertyFileException {
+        Path path = Paths.get("\\wrong.property");
+        exceptionRule.expect(WrongPropertyException.class);
+        ParsingFileAndReturnInstanceOfObject.loadFromProperties(Person.class, path);
     }
 }

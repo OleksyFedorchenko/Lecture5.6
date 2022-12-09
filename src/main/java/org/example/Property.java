@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface Property {
     String name() default "";
-    String format() default "";
+    String format() default "dd:MM.yyyy HH:mm";
 }
