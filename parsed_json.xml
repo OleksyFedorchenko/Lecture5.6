@@ -3,15 +3,15 @@
     <violation>
         <entry>
             <key>SPEEDING</key>
-            <value>8546711.25</value>
-        </entry>
-        <entry>
-            <key>DRIVING WITHOUT BELT</key>
-            <value>27300.0</value>
+            <value>1.9087629E7</value>
         </entry>
         <entry>
             <key>ALCOHOL DRIVING</key>
-            <value>12082.001</value>
+            <value>6910904.001</value>
+        </entry>
+        <entry>
+            <key>DRIVING WITHOUT BELT</key>
+            <value>3157440.0</value>
         </entry>
     </violation>
 </violations>
