@@ -21,8 +21,8 @@ public class AppTest {
      */
 
     @Test
-    public void TypeOfInstance() throws IOException, InstantiationException, IllegalAccessException, WrongPropertyFileException {
-        Path path = Paths.get("\\in.property");
+    public void testTypeOfInstance() throws IOException, InstantiationException, IllegalAccessException, WrongPropertyFileException {
+        Path path = Paths.get("\\in.properties");
         String expected = Person.class.getTypeName();
         assertEquals(expected, ParsingFileAndReturnInstanceOfObject.loadFromProperties(Person.class, path).getClass().getTypeName());
     }
@@ -32,8 +32,8 @@ public class AppTest {
 
 
     @Test
-    public void WrongProperty() throws IllegalAccessException, IOException, InstantiationException, WrongPropertyFileException {
-        Path path = Paths.get("\\wrong.property");
+    public void testWrongProperty() throws IllegalAccessException, IOException, InstantiationException, WrongPropertyFileException {
+        Path path = Paths.get("\\wrong.properties");
         exceptionRule.expect(WrongPropertyException.class);
         ParsingFileAndReturnInstanceOfObject.loadFromProperties(Person.class, path);
     }

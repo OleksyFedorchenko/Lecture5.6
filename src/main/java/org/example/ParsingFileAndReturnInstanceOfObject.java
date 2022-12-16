@@ -21,7 +21,7 @@ public class ParsingFileAndReturnInstanceOfObject {
         T c = cls.newInstance();
         Map<String, String> propertySet = new HashMap<>();
 
-        //Зчитуємо in.property в мапу
+        //Зчитуємо in.properties в мапу
         try {
             Scanner scan = new Scanner(propertyPath.getFileName());
             while (scan.hasNext()) {
@@ -36,7 +36,7 @@ public class ParsingFileAndReturnInstanceOfObject {
         //отримуємо всі поля з класу
         Field[] fields = c.getClass().getDeclaredFields();
 
-        //Парсимо in.property на філди класу
+        //Парсимо in.properties на філди класу
         for (Field f : fields) {
             for (Map.Entry<String, String> entry : propertySet.entrySet()) {
                 if (f.isAnnotationPresent(Property.class)) {
